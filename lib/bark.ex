@@ -1,18 +1,31 @@
 defmodule Bark do
   require Logger
 
+  defmacro __using__(_opts) do
+    quote do
+      @spec debug(Keyword.t()) :: :ok
+      def debug(opts), do: debug(unquote(__CALLER__), opts)
+      @spec info(Keyword.t()) :: :ok
+      def info(opts), do: info(unquote(__CALLER__), opts)
+      @spec warn(Keyword.t()) :: :ok
+      def warn(opts), do: warn(unquote(__CALLER__), opts)
+      @spec error(Keyword.t()) :: :ok
+      def error(opts), do: error(unquote(__CALLER__), opts)
+    end
+  end
+
   # Logs a list of kv pairs
-  @spec warn(any(), Keyword.t()) :: any()
-  def warn(env, opts), do: Logger.warn(parse_message(env, opts))
+  @spec debug(any(), Keyword.t()) :: any()
+  def debug(env, opts), do: Logger.debug(parse_message(env, opts))
 
   @spec info(any(), Keyword.t()) :: any()
   def info(env, opts), do: Logger.info(parse_message(env, opts))
 
+  @spec warn(any(), Keyword.t()) :: any()
+  def warn(env, opts), do: Logger.warn(parse_message(env, opts))
+
   @spec error(any(), Keyword.t()) :: any()
   def error(env, opts), do: Logger.error(parse_message(env, opts))
-
-  @spec debug(any(), Keyword.t()) :: any()
-  def debug(env, opts), do: Logger.debug(parse_message(env, opts))
 
   defp parse_message(env, opts) do
     {function_name, arity} =
